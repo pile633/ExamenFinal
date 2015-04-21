@@ -1,0 +1,138 @@
+<polymer-element name="table-stats" attributes="scores">
+  <template>
+    <style>
+      table{
+        background: #0040D0;
+        border-radius: 10px;
+        font-size: 30px; 
+      }
+      #title{
+        color: #EAEC2D;
+        text-align: center;
+        font-weight: bold;
+      }
+      #results{
+        color: white;
+        text-align: center;
+      }
+      td{
+        padding: 10px;
+      }
+
+    </style>
+<!--    <table id="table">
+      <tr id="title">
+        <td>Team</td><td>Wins</td>
+      </tr>
+      <tr id="results">
+        <td>MAD</td><td>5</td> 
+      </tr>
+      <tr id="results">
+        <td>BAR</td><td>4</td>
+      </tr>
+      <tr id="results">
+        <td>CAN</td><td>3</td> 
+      </tr>
+      <tr id="results">
+        <td>EST</td><td>2</td>
+      </tr>    
+    </table>-->
+    
+    <table class="score-table">
+			<caption>Stats</caption>
+		<tr id="title">
+      <td>Team</td>
+      <td>Wins</td>
+			</tr>
+			<template repeat="{{stat in stats}}">
+				<tr>
+					<td>{{stat.name}}</td>
+          <td>{{stat.wins}}</td>
+				</tr>
+			</template>
+		</table>
+
+  </template>
+  <script>
+    (function() {
+      function calculateStats(scores)
+      {
+        
+        var res = [];
+        var sw = 0;
+        var j,k;
+        if (!scores) {
+					return res;
+				}
+        
+        for(var i=0; i < scores.length; i++) {
+          var score = scores[i];
+          if(score.state === 'closed') {
+            
+            
+            for(j = 0; j < res.length; j++) {
+              if(res[j].name === score.homeName)
+              {
+                sw = 1;
+              }
+            }
+            if(sw === 0) {
+              res.push({
+                name: score.homeName,
+                wins: 0
+              });
+            }
+            
+            for(j = 0, sw = 0; j < res.length; j++) {
+              if(res[j].name === score.guestName)
+              {
+                sw = 1;
+              }
+            }
+            if(sw === 0) {
+              res.push({
+                name: score.guestName,
+                wins: 0
+              });
+            }
+            
+            if(score.home > score.guest) {
+                for(j=0; j < res.length; j++){
+                  if(res[j].name === score.homeName){
+                    res[j].wins = res[j].wins + 1;
+                  }
+                }
+            }
+            else {
+              for(j=0; j < res.length; j++){
+                  if(res[j].name === score.guestName){
+                    res[j].wins = res[j].wins + 1;
+                  }
+                }
+            }
+            
+            
+            
+          }
+        }
+        res.sort(function(a,b){
+              return b.wins - a.wins;
+            });
+        return res;
+			}
+    Polymer({
+        ready: function () {
+            this.calculateStats();
+        },
+        show: function () {
+          this.$.table.toggle();
+        },
+        calculateStats: function()
+        {
+          this.stats = calculateStats(this.scores);
+        }
+      });
+    }());
+    
+  </script>
+  </polymer-element>

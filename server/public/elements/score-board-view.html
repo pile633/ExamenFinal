@@ -1,0 +1,135 @@
+<link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="score-board-model.html">
+<link rel="import" href="score-team.html">
+
+<polymer-element name="score-board-view" attributes="model">
+  <template>
+    <style>
+			:host {
+				display: block;
+				position: relative;
+				padding: 10px;
+				width: 100%;
+				font-size: 2em;
+				font-family: LED;
+				font-weight: 300;
+				border-radius: 5px;
+				background: #7d7e7d;
+				background: linear-gradient(to right,  #7d7e7d 0%,#0e0e0e 100%);	
+			}
+			core-icon-button {
+				position: absolute;
+				top: 3px;
+				right: 3px;
+				color: gray;
+			}
+			core-icon-button:hover {
+				position: absolute;
+				color: red;
+			}
+            paper-toggle-button{
+        position: absolute;
+        top: 50px;
+      }
+      paper-toggle-button::shadow [checked] .toggle {
+      background-color: green;
+    }
+    paper-toggle-button::shadow [disabled] .toggle {
+      background-color: red;
+    }
+    #disabled{
+      position: relative;
+      color: white;
+      bottom: -25px;
+      left: -20px;
+    }
+    #opened{
+      position: relative;
+      color: green;
+      bottom: -25px;
+      left: -20px;
+    }
+    #closed{
+      position: relative;
+      color: red;
+      bottom: -25px;
+      left: -20px;
+    }
+    @media(max-width: 600px) {
+				#disabled {
+					display: none;
+				}
+        #opened{
+      display: none;
+    }
+    #closed{
+      display: none;
+    }
+    </style>
+		<score-board-model id="scoreModel"></score-board-model>
+		<div layout horizontal around-justified on-score-updated="{{handleScoreUpdated}}">
+			<score-team id="home"  isMine="{{isMine}}" teamLabel="{{model.homeName}}" dis="{{model.state !== 'opened'}}" teamName="home" teamScore="{{model.home}}"></score-team>
+      <div vertical layout>
+        <div horizontal layout around-justified>
+        <div id="{{nameState}}">{{nameState}}</div>
+        <paper-toggle-button id="tButton" disabled?="{{state1 || !isMine}}" checked?={{cheked}} hidden?="{{!isMine}}" on-change="{{handleState}}"></paper-toggle-button>
+        </div>
+       </div>
+			<score-team id="guest" isMine="{{isMine}}" teamLabel="{{model.guestName}}" dis="{{model.state !== 'opened'}}" teamName="guest" teamScore="{{model.guest}}"></score-team>
+		</div>
+
+    <core-icon-button
+      id="favicon"
+      icon="delete"
+      on-tap="{{handleRemoveScore}}" hidden?="{{!isMine}}">
+    </core-icon-button>
+
+  </template>
+  <script>
+		Polymer({
+			ready: function() {
+				this.scrollIntoView();
+				getProfile().done(function(profile) {
+					var userId = profile.id;
+          var state = this.model.state;
+          if(state === "opened")
+          {
+            this.cheked = true;
+          }
+          this.state = state;
+          this.nameState = state;
+          this.state1 = state === "closed";
+					this.isMine = (userId === this.model.owner);
+				}.bind(this)).fail(function() {
+					this.isMine = false;
+				}.bind(this));
+			},
+			handleRemoveScore: function() {
+				this.fire('score-remove', {score: this.model});
+			},
+			handleScoreUpdated: function(event, detail, sender) {
+				var team = detail.team;
+				var points = detail.points;
+				this.$.scoreModel.setScore(this.model, team, points);
+			},
+       handleState: function(event, detail, sender)
+      {
+        if(this.state === "disabled")
+        {
+          this.state = "checked";
+          this.nameState="opened";
+          this.$.scoreModel.setState(this.model,"opened");
+        }
+        else 
+        {
+          this.state = "disabled";
+          this.nameState = "closed";
+          this.state1 = true;
+        this.$.scoreModel.setState(this.model,"closed");
+        }
+        
+      }
+		});
+  </script>
+</polymer-element>

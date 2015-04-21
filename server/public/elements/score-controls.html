@@ -1,0 +1,40 @@
+<link rel="import" href="point-button.html">
+<link rel="import" href="point-setter/template.html">
+
+<polymer-element name="score-controls" attributes="teamName, isDisable">
+  <template>
+    <style>
+			:host {
+				font-size: 0.35em;
+				font-weight: bold;
+			}
+
+			point-button {
+				margin-right: 10px;
+			}
+
+			@media (max-width: 480px) {
+				point-button[points="+2"], point-button[points="+3"] {
+					display: none;
+				}
+			}
+
+			@media (max-width: 900px) {
+				point-setter {
+					display: none;
+				}
+			}
+
+    </style>
+    <div layout horizontal center>
+			<point-button color="red" points="-1" disabled="{{isDisable}}"></point-button>
+			<point-button points="+1" disabled="{{isDisable}}"></point-button>
+			<point-button points="+2" disabled="{{isDisable}}"></point-button>
+			<point-button points="+3" disabled="{{isDisable}}"></point-button>
+			<point-setter teamName="{{teamName}}" disabled="{{isDisable}}"></point-setter>
+    </div>
+  </template>
+  <script>
+		Polymer({});
+  </script>
+</polymer-element>

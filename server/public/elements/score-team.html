@@ -1,0 +1,52 @@
+<link rel="import" href="score-controls.html">
+
+<polymer-element name="score-team" attributes="isMine teamName teamLabel teamScore dis">
+  <template>
+    <style>
+			.team-name {
+				color: white;
+			}
+			.team-score {
+				color: yellow;
+				font-size: 3em;
+			}
+
+    </style>
+    <div layout vertical center on-basket-scored="{{handleBasket}}" on-score-setted="{{handleScoreSetted}}">
+			<div class="team-name">
+				{{teamLabel}}
+			</div>
+			<div class="team-score">
+				{{teamScore}}
+			</div>
+			<template if="{{isMine}}">
+				<score-controls id="controls" isDisable="{{dis}}" teamName="{{teamLabel}}"></score-controls>
+			</template>
+    </div>
+  </template>
+  <script>
+		(function() {
+			var fireScoreUpdated = _.debounce(function() {
+				this.fire('score-updated', {
+					team: this.teamName,
+					points: this.teamScore
+				});
+			}, 800);
+
+			Polymer({
+				handleBasket: function(event, detail, sender) {
+					if (this.teamScore + detail.points >= 0) {
+						this.teamScore += detail.points;
+						window.navigator.vibrate(20);
+						fireScoreUpdated.call(this);
+					}
+				},
+				handleScoreSetted: function(event, detail, sender) {
+					this.teamScore = detail.points;
+					window.navigator.vibrate(20);
+					fireScoreUpdated.call(this);
+				}
+			});
+		}());
+  </script>
+</polymer-element>
